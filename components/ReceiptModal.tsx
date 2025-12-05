@@ -12,6 +12,7 @@ interface ReceiptModalProps {
 
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) => {
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const receiptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,31 +26,53 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
   }, []);
 
   const handleDownloadPDF = async () => {
-    if (!receiptRef.current || isPrinting) return;
+    if (!receiptRef.current || isPrinting || isExiting) return;
     
     setIsPrinting(true);
 
     try {
-      // 1. Capture the element
-      const element = receiptRef.current;
+      const originalElement = receiptRef.current;
       
-      // Wait a moment for any rendering to stabilize
+      // 1. CLONE THE ELEMENT
+      const clone = originalElement.cloneNode(true) as HTMLElement;
+
+      // 2. CONFIGURE THE CLONE
+      clone.style.position = 'fixed';
+      clone.style.top = '-10000px';
+      clone.style.left = '0';
+      clone.style.zIndex = '-1000';
+      clone.style.width = `${originalElement.offsetWidth}px`; 
+      clone.style.height = 'auto'; // Force full height
+
+      // 3. EXPAND SCROLLABLE AREAS
+      const scrollableContainer = clone.querySelector('.overflow-y-auto') as HTMLElement;
+      if (scrollableContainer) {
+        scrollableContainer.style.maxHeight = 'none';
+        scrollableContainer.style.overflow = 'visible';
+        scrollableContainer.style.height = 'auto';
+        scrollableContainer.classList.remove('max-h-[40vh]'); 
+      }
+
+      document.body.appendChild(clone);
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const canvas = await html2canvas(element, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true, // Allow loading cross-origin images
+      // 4. CAPTURE
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: clone.scrollWidth,
+        windowHeight: clone.scrollHeight
       });
 
+      document.body.removeChild(clone);
       const imgData = canvas.toDataURL('image/png');
 
-      // 2. Calculate PDF dimensions (Thermal paper style ~80mm width)
-      const pdfWidth = 80; 
+      // 5. GENERATE PDF
+      const pdfWidth = 80;
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      // 3. Create PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -57,19 +80,22 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
       });
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      
-      // 4. Download
       pdf.save(`Ticket-${sale.id}.pdf`);
 
-      // 5. Close modal after brief delay (optional, keeps the flow feeling "done")
+      // 6. ANIMATE OUT
+      setIsPrinting(false);
+      setIsExiting(true); // Trigger slide down
+
+      // Wait for animation to finish before unmounting
       setTimeout(() => {
         onPrint(); 
-      }, 1000);
+      }, 800);
 
     } catch (error) {
       console.error("Error generating PDF:", error);
       setIsPrinting(false);
-      alert("Hubo un error al generar el PDF. Por favor intente de nuevo.");
+      setIsExiting(false);
+      alert("Hubo un error al generar el PDF.");
     }
   };
 
@@ -80,8 +106,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
         {/* Receipt Scroll Container */}
         <div 
             className={`
-                w-full relative overflow-hidden transition-all ease-in-out flex-1 flex flex-col
-                ${isPrinting ? 'opacity-50 pointer-events-none' : 'animate-in slide-in-from-top-10 duration-500'}
+                w-full relative overflow-hidden flex-1 flex flex-col transition-all ease-in-out duration-700 transform
+                ${isExiting ? 'translate-y-[150%] opacity-0' : 'translate-y-0 opacity-100'}
+                ${!isExiting && !isPrinting ? 'animate-in slide-in-from-top-10 duration-500' : ''}
+                ${isPrinting ? 'scale-[0.98] brightness-95' : ''}
             `}
         >
              {/* The Paper itself - REFERENCED for PDF generation */}
@@ -89,8 +117,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
                 ref={receiptRef}
                 className="bg-white shadow-2xl w-full flex flex-col overflow-hidden relative"
                 style={{ 
-                    // Clip path looks cool on screen but can be tricky in PDF. 
-                    // We keep it for screen, html2canvas usually handles the box model.
+                    // Clip path visual effect
                     clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), 95% 100%, 90% calc(100% - 10px), 85% 100%, 80% calc(100% - 10px), 75% 100%, 70% calc(100% - 10px), 65% 100%, 60% calc(100% - 10px), 55% 100%, 50% calc(100% - 10px), 45% 100%, 40% calc(100% - 10px), 35% 100%, 30% calc(100% - 10px), 25% 100%, 20% calc(100% - 10px), 15% 100%, 10% calc(100% - 10px), 5% 100%, 0 calc(100% - 10px))',
                     paddingBottom: '20px' 
                 }}
@@ -108,9 +135,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
                     </div>
                 </div>
 
-                {/* Items List (Normally scrollable, but we want full height for PDF if possible, though handling overflow in PDF capture implies capturing the scroll view. 
-                   For simplicity in this version, we set max-height large enough or let it expand for the PDF capture, but on screen it scrolls.) 
-                */}
+                {/* Items List (Scrollable on screen, Full height in clone/PDF) */}
                 <div className="p-8 py-4 space-y-3 font-mono text-sm overflow-y-auto max-h-[40vh] scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
                     <div className="flex justify-between text-slate-500 text-xs uppercase border-b border-slate-100 pb-2 sticky top-0 bg-white z-10">
                     <span>Desc</span>
@@ -167,9 +192,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
         </div>
 
         {/* Action Buttons (Fixed outside of scroll) */}
-        <div className="shrink-0 mt-6 flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 z-50">
+        <div className={`
+            shrink-0 mt-6 flex flex-col items-center gap-3 transition-opacity duration-300 z-50
+            ${isExiting ? 'opacity-0 pointer-events-none' : 'animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300'}
+        `}>
             <button
-                disabled={isPrinting}
+                disabled={isPrinting || isExiting}
                 onClick={handleDownloadPDF}
                 className="group relative bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-400 text-white pl-6 pr-8 py-3 rounded-full font-bold shadow-xl shadow-indigo-900/40 hover:shadow-indigo-600/40 transition-all active:scale-95 flex items-center gap-3"
             >
@@ -189,7 +217,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
                 )}
             </button>
             
-            {!isPrinting && (
+            {!isPrinting && !isExiting && (
                 <button 
                 onClick={onClose} 
                 className="text-white/50 hover:text-white text-sm transition-colors"

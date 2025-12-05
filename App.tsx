@@ -7,7 +7,8 @@ import {
   ChevronUp,
   ChevronDown,
   FileText,
-  Printer
+  Printer,
+  PieChart
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from './constants';
 import { Product, CartItem, Category, Sale, GeminiAnalysis } from './types';
@@ -19,9 +20,10 @@ import ProductCard from './components/ProductCard';
 import CartContent from './components/CartContent';
 import ReceiptModal from './components/ReceiptModal';
 import PaymentModal from './components/PaymentModal';
+import CloseRegister from './components/CloseRegister';
 
 export default function App() {
-  const [view, setView] = useState<'pos' | 'history'>('pos');
+  const [view, setView] = useState<'pos' | 'history' | 'close'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
@@ -137,6 +139,13 @@ export default function App() {
     setShowReceipt(true);
   };
 
+  const handleCloseDay = () => {
+    // In a real app, this would save to a database first
+    setSalesHistory([]);
+    setView('pos');
+    alert("¡Cierre de día exitoso! El sistema está listo para una nueva jornada.");
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-100 overflow-hidden font-sans text-slate-800">
       {/* Sidebar - Hidden on mobile, shown on tablet/desktop */}
@@ -157,6 +166,12 @@ export default function App() {
             label="Historial" 
             isActive={view === 'history'} 
             onClick={() => setView('history')} 
+          />
+          <SidebarItem 
+            icon={PieChart} 
+            label="Cierre Z" 
+            isActive={view === 'close'} 
+            onClick={() => setView('close')} 
           />
         </nav>
       </div>
@@ -357,6 +372,10 @@ export default function App() {
             )}
           </div>
         )}
+
+        {view === 'close' && (
+          <CloseRegister sales={salesHistory} onCloseDay={handleCloseDay} />
+        )}
       </div>
 
       {/* Mobile Bottom Navigation */}
@@ -373,6 +392,13 @@ export default function App() {
             label="Historial" 
             isActive={view === 'history'} 
             onClick={() => setView('history')} 
+            mobile
+          />
+          <SidebarItem 
+            icon={PieChart} 
+            label="Cierre Z" 
+            isActive={view === 'close'} 
+            onClick={() => setView('close')} 
             mobile
           />
       </div>
