@@ -8,7 +8,8 @@ import {
   ChevronDown,
   FileText,
   Printer,
-  PieChart
+  PieChart,
+  Users
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from './constants';
 import { Product, CartItem, Category, Sale, GeminiAnalysis } from './types';
@@ -21,9 +22,10 @@ import CartContent from './components/CartContent';
 import ReceiptModal from './components/ReceiptModal';
 import PaymentModal from './components/PaymentModal';
 import CloseRegister from './components/CloseRegister';
+import UsersView from './components/UsersView';
 
 export default function App() {
-  const [view, setView] = useState<'pos' | 'history' | 'close'>('pos');
+  const [view, setView] = useState<'pos' | 'history' | 'close' | 'users'>('pos');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
@@ -172,6 +174,12 @@ export default function App() {
             label="Cierre Z" 
             isActive={view === 'close'} 
             onClick={() => setView('close')} 
+          />
+          <SidebarItem 
+            icon={Users} 
+            label="Usuarios" 
+            isActive={view === 'users'} 
+            onClick={() => setView('users')} 
           />
         </nav>
       </div>
@@ -376,6 +384,10 @@ export default function App() {
         {view === 'close' && (
           <CloseRegister sales={salesHistory} onCloseDay={handleCloseDay} />
         )}
+
+        {view === 'users' && (
+          <UsersView />
+        )}
       </div>
 
       {/* Mobile Bottom Navigation */}
@@ -399,6 +411,13 @@ export default function App() {
             label="Cierre Z" 
             isActive={view === 'close'} 
             onClick={() => setView('close')} 
+            mobile
+          />
+           <SidebarItem 
+            icon={Users} 
+            label="Usuarios" 
+            isActive={view === 'users'} 
+            onClick={() => setView('users')} 
             mobile
           />
       </div>

@@ -1,4 +1,4 @@
-import { Product, Category } from './types';
+import { Product, Category, User } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   // --- CAFÉ ---
@@ -184,4 +184,60 @@ export const MOCK_PRODUCTS: Product[] = [
     image: 'https://images.unsplash.com/photo-1547827800-410a569769da?auto=format&fit=crop&w=400&q=80',
     color: 'bg-stone-50'
   }
+];
+
+export const MOCK_USERS: User[] = [
+  {
+    id: '2',
+    name: 'Franco Montti',
+    email: 'franco.montti.19@gmail.com',
+    role: 'Superadmin',
+    branches: ['Casa Central', 'Sucursal Norte', 'Sucursal Sur'],
+    status: 'active',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  },
+  {
+    id: '3',
+    name: 'Mariana López',
+    email: 'mariana.lopez@pos.com',
+    role: 'Cashier',
+    branches: ['Casa Central'],
+    status: 'active',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  },
+  {
+    id: '4',
+    name: 'Carlos Ruiz',
+    email: 'carlos.ruiz@pos.com',
+    role: 'Cashier',
+    branches: ['Sucursal Norte'],
+    status: 'inactive',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  },
+  {
+    id: '5',
+    name: 'Ana García',
+    email: 'ana.garcia@pos.com',
+    role: 'Admin',
+    branches: ['Sucursal Sur', 'Sucursal Oeste'],
+    status: 'active',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  },
+  {
+    id: '6',
+    name: 'Roberto Gómez',
+    email: 'roberto.g@pos.com',
+    role: 'Cashier',
+    branches: ['Sucursal Sur'],
+    status: 'active',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  }
+];
+
+export const AVAILABLE_BRANCHES = [
+  'Casa Central',
+  'Sucursal Norte',
+  'Sucursal Sur',
+  'Sucursal Este',
+  'Sucursal Oeste'
 ];

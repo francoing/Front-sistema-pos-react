@@ -35,3 +35,15 @@ export interface GeminiAnalysis {
   upsellSuggestion: string;
   thankYouNote: string;
 }
+
+export type UserRole = 'Superadmin' | 'Admin' | 'Cashier';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  branches: string[];
+  status: 'active' | 'inactive';
+  avatar: string;
+}
