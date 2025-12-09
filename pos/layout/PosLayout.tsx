@@ -3,7 +3,7 @@ import { LayoutGrid, ShoppingBag, History, PieChart, Users } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from '../../components/SidebarItem';
 
-export const PosLayout = ({ children }: { children: React.ReactNode }) => {
+export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
