@@ -8,15 +8,12 @@ const novaApi = axios.create({
     baseURL: VITE_API_URL || 'http://localhost:3000/api', // Fallback por defecto si no hay variable
 });
 
-/*
 novaApi.interceptors.request.use((config) => {
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${VITE_TOKEN}`,
-    };
+    if (VITE_TOKEN) {
+        config.headers['Authorization'] = `Bearer ${VITE_TOKEN}`;
+    }
   
     return config;
 });
 
 export default novaApi;
-*/

@@ -1,9 +1,12 @@
+
 import { configureStore } from '@reduxjs/toolkit';
 import { posSlice } from './posSlice';
+import { authSlice } from './auth/authSlice';
 
 export const store = configureStore({
     reducer: {
-        pos: posSlice.reducer
+        pos: posSlice.reducer,
+        auth: authSlice.reducer,
     },
     middleware: (getDefaultMiddleware) => 
         getDefaultMiddleware({

@@ -1,11 +1,16 @@
+
 import React from 'react';
-import { LayoutGrid, ShoppingBag, History, PieChart, Users } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from '../../components/SidebarItem';
+import { useAuthStore } from '../../hooks/useAuthStore';
 
 export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuthStore();
+
+  const isAdmin = user?.role === 'Admin' || user?.role === 'Superadmin';
 
   // Helper to determine active route
   const isActive = (path: string) => {
@@ -22,12 +27,23 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
         </div>
         
         <nav className="flex-1 w-full space-y-2">
+          
           <SidebarItem 
             icon={ShoppingBag} 
             label="Venta" 
             isActive={isActive('/')} 
             onClick={() => navigate('/')} 
           />
+
+          {isAdmin && (
+            <SidebarItem 
+              icon={LayoutDashboard} 
+              label="Dash" 
+              isActive={isActive('/dashboard')} 
+              onClick={() => navigate('/dashboard')} 
+            />
+          )}
+
           <SidebarItem 
             icon={History} 
             label="Historial" 
@@ -55,7 +71,7 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden bg-white border-t border-slate-200 flex justify-around p-2 pb-safe-bottom z-30 shrink-0">
+      <div className="md:hidden bg-white border-t border-slate-200 flex justify-around p-2 pb-safe-bottom z-30 shrink-0 overflow-x-auto">
          <SidebarItem 
             icon={ShoppingBag} 
             label="Venta" 
@@ -63,6 +79,17 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
             onClick={() => navigate('/')} 
             mobile
           />
+          
+          {isAdmin && (
+            <SidebarItem 
+                icon={LayoutDashboard} 
+                label="Dash" 
+                isActive={isActive('/dashboard')} 
+                onClick={() => navigate('/dashboard')} 
+                mobile
+            />
+          )}
+
           <SidebarItem 
             icon={History} 
             label="Historial" 

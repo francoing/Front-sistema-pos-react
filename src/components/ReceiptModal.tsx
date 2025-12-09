@@ -210,7 +210,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
             <button
                 disabled={isPrinting || isExiting}
                 onClick={handleDownloadPDF}
-                className="group relative bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-400 text-white pl-6 pr-8 py-3 rounded-full font-bold shadow-xl shadow-indigo-900/40 hover:shadow-indigo-600/40 transition-all active:scale-95 flex items-center gap-3"
+                className="group relative bg-indigo-600 hover:bg-indigo-50 disabled:bg-indigo-400 text-white pl-6 pr-8 py-3 rounded-full font-bold shadow-xl shadow-indigo-900/40 hover:shadow-indigo-600/40 transition-all active:scale-95 flex items-center gap-3"
             >
                 {isPrinting ? (
                     <Loader2 size={20} className="animate-spin" />
