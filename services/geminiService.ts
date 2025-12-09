@@ -1,9 +1,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CartItem, GeminiAnalysis } from "../types";
 
-// Initialize Gemini
-// NOTE: In a real production app, ensure your key is secure.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Helper function to safely access API KEY in different environments (Vite, Node, etc.)
+const getApiKey = () => {
+  try {
+    // Check for Vite environment variable first
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+    // Check for Node/Process environment variable
+    if (typeof process !== 'undefined' && process.env?.API_KEY) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors accessing env
+  }
+  return '';
+};
+
+// Initialize Gemini with safe key retrieval
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const analyzeCartAndGenerateReceipt = async (items: CartItem[], customerName: string = "Cliente"): Promise<GeminiAnalysis> => {
   if (!items || items.length === 0) {

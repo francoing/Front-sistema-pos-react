@@ -1,6 +1,7 @@
+
 import React, { useRef, useState } from 'react';
 import { Sale } from '../types';
-import { DollarSign, CreditCard, Hash, Printer, Lock, AlertTriangle, Loader2 } from 'lucide-react';
+import { DollarSign, CreditCard, Hash, Printer, Lock, AlertTriangle, Loader2, QrCode } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -18,6 +19,8 @@ const CloseRegister: React.FC<CloseRegisterProps> = ({ sales, onCloseDay }) => {
   const totalCash = sales.filter(s => s.paymentMethod === 'cash').reduce((acc, s) => acc + s.total, 0);
   const totalCard = sales.filter(s => s.paymentMethod === 'card').reduce((acc, s) => acc + s.total, 0);
   const totalTransfer = sales.filter(s => s.paymentMethod === 'transfer').reduce((acc, s) => acc + s.total, 0);
+  const totalQR = sales.filter(s => s.paymentMethod === 'qr').reduce((acc, s) => acc + s.total, 0);
+  
   const ticketAverage = sales.length > 0 ? totalSales / sales.length : 0;
 
   const handlePrintReport = async () => {
@@ -126,7 +129,7 @@ const CloseRegister: React.FC<CloseRegisterProps> = ({ sales, onCloseDay }) => {
             <div className="p-6 border-b border-slate-100">
                 <h3 className="font-bold text-lg text-slate-800">Desglose por Método de Pago</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-slate-100">
                 <div className="p-6 flex flex-col items-center text-center">
                     <span className="text-sm text-slate-500 mb-1">Efectivo</span>
                     <span className="text-2xl font-bold text-slate-800">${totalCash.toFixed(2)}</span>
@@ -135,7 +138,7 @@ const CloseRegister: React.FC<CloseRegisterProps> = ({ sales, onCloseDay }) => {
                     </div>
                 </div>
                 <div className="p-6 flex flex-col items-center text-center">
-                    <span className="text-sm text-slate-500 mb-1">Tarjeta Crédito/Débito</span>
+                    <span className="text-sm text-slate-500 mb-1">Tarjeta</span>
                     <span className="text-2xl font-bold text-slate-800">${totalCard.toFixed(2)}</span>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
                         <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${(totalCard/totalSales || 0)*100}%` }}></div>
@@ -146,6 +149,13 @@ const CloseRegister: React.FC<CloseRegisterProps> = ({ sales, onCloseDay }) => {
                     <span className="text-2xl font-bold text-slate-800">${totalTransfer.toFixed(2)}</span>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
                         <div className="bg-purple-500 h-full rounded-full" style={{ width: `${(totalTransfer/totalSales || 0)*100}%` }}></div>
+                    </div>
+                </div>
+                 <div className="p-6 flex flex-col items-center text-center">
+                    <span className="text-sm text-slate-500 mb-1">QR Mercado Pago</span>
+                    <span className="text-2xl font-bold text-slate-800">${totalQR.toFixed(2)}</span>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
+                        <div className="bg-blue-400 h-full rounded-full" style={{ width: `${(totalQR/totalSales || 0)*100}%` }}></div>
                     </div>
                 </div>
             </div>
@@ -189,6 +199,10 @@ const CloseRegister: React.FC<CloseRegisterProps> = ({ sales, onCloseDay }) => {
                         <div className="flex justify-between">
                             <span>TRANSFERENCIA:</span>
                             <span>${totalTransfer.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span>QR MERCADO PAGO:</span>
+                            <span>${totalQR.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

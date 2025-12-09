@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, Check } from 'lucide-react';
 import { AVAILABLE_BRANCHES } from '../constants';
 import { User, UserRole } from '../types';
@@ -6,9 +6,10 @@ import { User, UserRole } from '../types';
 interface UserFormModalProps {
   onClose: () => void;
   onSave: (user: User) => void;
+  userToEdit?: User | null;
 }
 
-const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
+const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave, userToEdit }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +19,30 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
   });
 
   const [selectedBranches, setSelectedBranches] = useState<Set<string>>(new Set());
+
+  // Initialize form if editing, OR reset if creating new
+  useEffect(() => {
+    if (userToEdit) {
+      setFormData({
+        name: userToEdit.name,
+        email: userToEdit.email,
+        password: '', // Don't pre-fill password for security
+        confirmPassword: '',
+        role: userToEdit.role,
+      });
+      setSelectedBranches(new Set(userToEdit.branches));
+    } else {
+      // RESET FORM for new user
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'Cashier',
+      });
+      setSelectedBranches(new Set());
+    }
+  }, [userToEdit]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,22 +60,38 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
 
   const handleSubmit = () => {
     if (!formData.name || !formData.email) {
-      alert('Por favor complete los campos requeridos');
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      alert('Por favor complete el nombre y el email');
       return;
     }
 
+    // Password validation logic
+    if (userToEdit) {
+        // Edit mode: Password is optional (only validate if user typed something)
+        if (formData.password && formData.password !== formData.confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+    } else {
+        // Create mode: Password is mandatory
+        if (!formData.password) {
+            alert('La contraseña es obligatoria para nuevos usuarios');
+            return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+    }
+
     const newUser: User = {
-      id: Math.random().toString(36).substr(2, 6).toUpperCase(),
+      id: userToEdit ? userToEdit.id : Math.random().toString(36).substr(2, 6).toUpperCase(),
       name: formData.name,
       email: formData.email,
       role: formData.role,
       branches: Array.from(selectedBranches),
-      status: 'active',
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=random`
+      status: userToEdit ? userToEdit.status : 'active',
+      // Generate avatar only if new, otherwise keep existing
+      avatar: userToEdit ? userToEdit.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=random`
     };
 
     onSave(newUser);
@@ -66,8 +107,12 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
         <div className="p-6 pb-2">
             <div className="flex justify-between items-start">
                 <div className="border-l-4 border-indigo-600 pl-4">
-                    <h2 className="text-xl font-bold text-slate-800">Nuevo Usuario</h2>
-                    <p className="text-slate-500 text-sm">Complete la información requerida</p>
+                    <h2 className="text-xl font-bold text-slate-800">
+                      {userToEdit ? 'Editar Usuario' : 'Nuevo Usuario'}
+                    </h2>
+                    <p className="text-slate-500 text-sm">
+                      {userToEdit ? 'Modifique la información necesaria' : 'Complete la información requerida'}
+                    </p>
                 </div>
                 <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
                     <X size={24} />
@@ -103,18 +148,22 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
                     />
                 </div>
                 <div className="md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-500 uppercase">Contraseña*</label>
+                    <label className="text-xs font-semibold text-slate-500 uppercase">
+                      {userToEdit ? 'Contraseña (Opcional)' : 'Contraseña*'}
+                    </label>
                     <input 
                         type="password" 
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        placeholder="Contraseña"
+                        placeholder={userToEdit ? "Dejar vacía para mantener" : "Contraseña"}
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition-all"
                     />
                 </div>
                 <div className="md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-500 uppercase">Confirmar Contraseña</label>
+                    <label className="text-xs font-semibold text-slate-500 uppercase">
+                       {userToEdit ? 'Confirmar (Opcional)' : 'Confirmar Contraseña'}
+                    </label>
                     <input 
                         type="password" 
                         name="confirmPassword"
@@ -146,15 +195,6 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
                             <span className={`text-sm ${formData.role === role ? 'text-indigo-900 font-semibold' : 'text-slate-600'}`}>{role}</span>
                         </label>
                     ))}
-                    {/* Visual dummy checkboxes to match the image style */}
-                    <label className="flex items-center gap-2 cursor-pointer opacity-50">
-                        <div className="w-5 h-5 rounded border border-slate-300 bg-white"></div>
-                        <span className="text-sm text-slate-500">Manager</span>
-                    </label>
-                     <label className="flex items-center gap-2 cursor-pointer opacity-50">
-                        <div className="w-5 h-5 rounded border border-slate-300 bg-white"></div>
-                        <span className="text-sm text-slate-500">Employee</span>
-                    </label>
                 </div>
             </div>
 
@@ -212,7 +252,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSave }) => {
                 className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-lg shadow-orange-200 transition-colors flex items-center gap-2"
             >
                 <Save size={18} />
-                Guardar
+                {userToEdit ? 'Actualizar' : 'Guardar'}
             </button>
         </div>
 

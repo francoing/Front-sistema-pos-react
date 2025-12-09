@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   LayoutGrid, 
@@ -9,7 +10,9 @@ import {
   FileText,
   Printer,
   PieChart,
-  Users
+  Users,
+  Trash2,
+  Filter
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from './constants';
 import { Product, CartItem, Category, Sale, GeminiAnalysis } from './types';
@@ -33,6 +36,9 @@ export default function App() {
   const [salesHistory, setSalesHistory] = useState<Sale[]>([]);
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
   
+  // History Search State
+  const [historyQuery, setHistoryQuery] = useState('');
+  
   // New States for Receipt Logic
   const [lastCompletedSale, setLastCompletedSale] = useState<Sale | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
@@ -54,6 +60,16 @@ export default function App() {
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory]);
+
+  // Filter History
+  const filteredHistory = useMemo(() => {
+    if (!historyQuery) return salesHistory;
+    const query = historyQuery.toLowerCase();
+    return salesHistory.filter(sale => 
+      sale.customerName?.toLowerCase().includes(query) || 
+      sale.id.toLowerCase().includes(query)
+    );
+  }, [salesHistory, historyQuery]);
 
   // Actions
   const addToCart = (product: Product) => {
@@ -102,7 +118,7 @@ export default function App() {
     }
   };
 
-  const handleCheckout = async (method: 'cash' | 'card' | 'transfer', customer: string) => {
+  const handleCheckout = async (method: 'cash' | 'card' | 'transfer' | 'qr', customer: string) => {
     // Generate final Gemini note if not already present
     let finalNote = geminiAnalysis?.thankYouNote;
     
@@ -119,7 +135,7 @@ export default function App() {
       tax,
       total,
       paymentMethod: method,
-      customerName: customer,
+      customerName: customer || "Cliente General",
       aiMessage: finalNote
     };
 
@@ -139,6 +155,12 @@ export default function App() {
   const handleReprint = (sale: Sale) => {
     setLastCompletedSale(sale);
     setShowReceipt(true);
+  };
+
+  const handleDeleteSale = (saleId: string) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este comprobante? Esta acción afectará el cierre de caja.')) {
+      setSalesHistory(prev => prev.filter(s => s.id !== saleId));
+    }
   };
 
   const handleCloseDay = () => {
@@ -320,12 +342,40 @@ export default function App() {
 
         {view === 'history' && (
           <div className="flex-1 p-4 md:p-8 bg-slate-50 overflow-y-auto pb-24">
-            <h1 className="text-2xl font-bold text-slate-800 mb-6">Historial de Ventas</h1>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800">Historial de Ventas</h1>
+                  <p className="text-slate-500 text-sm mt-1">
+                    Mostrando {filteredHistory.length} comprobantes (${filteredHistory.reduce((acc, s) => acc + s.total, 0).toFixed(2)})
+                  </p>
+                </div>
+                
+                {/* Search Bar for History */}
+                <div className="relative w-full md:w-80">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input 
+                    type="text" 
+                    placeholder="Buscar cliente o ID de ticket..." 
+                    value={historyQuery}
+                    onChange={(e) => setHistoryQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm text-sm"
+                  />
+                  {historyQuery && (
+                    <button 
+                      onClick={() => setHistoryQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <Filter size={14} className="opacity-50" />
+                    </button>
+                  )}
+                </div>
+            </div>
             
-            {salesHistory.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 text-slate-400">
+            {filteredHistory.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-96 text-slate-400 bg-white rounded-2xl border border-slate-100 border-dashed">
                 <History size={64} className="mb-4 opacity-20" />
-                <p>No hay ventas registradas aún.</p>
+                <p className="font-medium">No se encontraron comprobantes.</p>
+                {historyQuery && <p className="text-sm mt-2 opacity-70">Intenta con otro término de búsqueda.</p>}
               </div>
             ) : (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -342,14 +392,20 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {salesHistory.map((sale) => (
+                      {filteredHistory.map((sale) => (
                         <tr key={sale.id} className="hover:bg-slate-50 transition-colors">
                           <td className="p-4 font-mono text-sm text-slate-500">#{sale.id}</td>
-                          <td className="p-4 font-medium text-slate-800">{sale.customerName}</td>
-                          <td className="p-4 text-slate-500 text-sm">{sale.date.toLocaleTimeString()}</td>
+                          <td className="p-4 font-medium text-slate-800">
+                             {sale.customerName}
+                          </td>
+                          <td className="p-4 text-slate-500 text-sm">{sale.date.toLocaleDateString()} {sale.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
                           <td className="p-4">
-                             <span className="px-2 py-1 rounded bg-slate-100 text-slate-600 text-xs font-bold uppercase">
-                               {sale.paymentMethod === 'cash' ? 'Efectivo' : sale.paymentMethod === 'card' ? 'Tarjeta' : 'Transf.'}
+                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase
+                               ${sale.paymentMethod === 'qr' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}
+                             `}>
+                               {sale.paymentMethod === 'cash' ? 'Efectivo' : 
+                                sale.paymentMethod === 'card' ? 'Tarjeta' : 
+                                sale.paymentMethod === 'qr' ? 'QR' : 'Transf.'}
                              </span>
                           </td>
                           <td className="p-4 font-bold text-slate-900">${sale.total.toFixed(2)}</td>
@@ -368,6 +424,13 @@ export default function App() {
                                 title="Reimprimir"
                               >
                                 <Printer size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteSale(sale.id)}
+                                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                title="Eliminar Comprobante"
+                              >
+                                <Trash2 size={18} />
                               </button>
                             </div>
                           </td>

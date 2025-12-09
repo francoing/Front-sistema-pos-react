@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { LayoutGrid, Printer, QrCode, Download, Loader2 } from 'lucide-react';
 import { Sale } from '../types';
@@ -99,6 +100,16 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
     }
   };
 
+  const getPaymentLabel = (method: string) => {
+      switch (method) {
+          case 'cash': return 'Efectivo';
+          case 'card': return 'Tarjeta';
+          case 'transfer': return 'Transferencia';
+          case 'qr': return 'QR Mercado Pago';
+          default: return method;
+      }
+  };
+
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div className="relative flex flex-col items-center max-w-sm w-full h-full max-h-[90vh]">
@@ -168,7 +179,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose, onPrint }) =
                     <span>${sale.total.toFixed(2)}</span>
                     </div>
                     <div className="mt-4 text-xs text-slate-500 uppercase">
-                    Pago: {sale.paymentMethod === 'cash' ? 'Efectivo' : sale.paymentMethod === 'card' ? 'Tarjeta' : 'Transferencia'}
+                    Pago: {getPaymentLabel(sale.paymentMethod)}
                     </div>
                     <div className="mt-1 text-xs text-slate-500 uppercase">
                     Cliente: {sale.customerName}

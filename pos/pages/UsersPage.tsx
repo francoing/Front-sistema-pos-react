@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Plus, MoreVertical, Edit2, Trash2, Shield, MapPin, Mail } from 'lucide-react';
-import { User, UserRole } from '../types';
-import { MOCK_USERS } from '../constants';
-import UserFormModal from './UserFormModal';
+import { Search, Plus, Edit2, Trash2, Shield, MapPin, Mail, MoreVertical } from 'lucide-react';
+import { usePosStore } from '../../hooks/usePosStore';
+import { User, UserRole } from '../../types';
+import UserFormModal from '../../components/UserFormModal';
 
-const UsersView: React.FC = () => {
+export const UsersPage = () => {
+  const { users, saveUser, deleteUser } = usePosStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -24,22 +24,6 @@ const UsersView: React.FC = () => {
     }
   };
 
-  const handleSaveUser = (savedUser: User) => {
-    // Check if the user ID exists in the current list
-    const exists = users.some(u => u.id === savedUser.id);
-    
-    if (exists) {
-        // Edit Mode: Replace the user with the matching ID
-        setUsers(users.map(u => u.id === savedUser.id ? savedUser : u));
-    } else {
-        // Create Mode: Add to the beginning of the list
-        setUsers([savedUser, ...users]);
-    }
-    
-    setIsModalOpen(false);
-    setEditingUser(null);
-  };
-
   const handleEditClick = (user: User) => {
     setEditingUser(user);
     setIsModalOpen(true);
@@ -47,13 +31,19 @@ const UsersView: React.FC = () => {
 
   const handleDeleteClick = (userId: string) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
-        setUsers(users.filter(u => u.id !== userId));
+        deleteUser(userId);
     }
   };
 
   const openNewUserModal = () => {
     setEditingUser(null);
     setIsModalOpen(true);
+  }
+
+  const handleSave = (user: User) => {
+    saveUser(user);
+    setIsModalOpen(false);
+    setEditingUser(null);
   }
 
   return (
@@ -90,15 +80,6 @@ const UsersView: React.FC = () => {
                onChange={(e) => setSearchTerm(e.target.value)}
                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium"
              />
-           </div>
-           {/* Placeholder for future filters */}
-           <div className="flex gap-2">
-             <select className="bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                <option value="all">Todos los Roles</option>
-                <option value="superadmin">Superadmin</option>
-                <option value="admin">Admin</option>
-                <option value="cashier">Cajero</option>
-             </select>
            </div>
         </div>
 
@@ -189,27 +170,16 @@ const UsersView: React.FC = () => {
               </tbody>
             </table>
           </div>
-          
-          {/* Pagination Placeholder */}
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span>Mostrando {filteredUsers.length} de {users.length} registros</span>
-              <div className="flex gap-2">
-                 <button className="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Anterior</button>
-                 <button className="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50">Siguiente</button>
-              </div>
-          </div>
         </div>
       </div>
 
       {isModalOpen && (
         <UserFormModal 
             onClose={() => setIsModalOpen(false)} 
-            onSave={handleSaveUser}
+            onSave={handleSave}
             userToEdit={editingUser}
         />
       )}
     </div>
   );
 };
-
-export default UsersView;
