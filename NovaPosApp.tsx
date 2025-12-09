@@ -1,14 +1,15 @@
 import React from 'react';
 import { HashRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import { AppRouter } from './router/AppRouter';
-import { PosProvider } from './store/PosContext';
+import { store } from './store/store';
 
 export const NovaPosApp = () => {
   return (
-    <HashRouter>
-      <PosProvider>
+    <Provider store={store}>
+      <HashRouter>
         <AppRouter />
-      </PosProvider>
-    </HashRouter>
+      </HashRouter>
+    </Provider>
   );
 };
