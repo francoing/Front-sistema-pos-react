@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { NovaPosApp } from './NovaPosApp';
+import { NovaPosApp } from './src/NovaPosApp';
 import './index.css';
 
 const rootElement = document.getElementById('root');
