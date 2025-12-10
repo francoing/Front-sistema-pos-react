@@ -1,5 +1,6 @@
 
-import { Product, Category, User, Client } from './types';
+
+import { Product, Category, User, Client, Branch } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   // --- CAFÉ ---
@@ -305,6 +306,58 @@ export const MOCK_CLIENTS: Client[] = [
     { id: '1', name: 'Juan Pérez', email: 'juan@gmail.com', phone: '555-1234', taxId: '20123456789' },
     { id: '2', name: 'María Gonzalez', email: 'maria@hotmail.com', phone: '555-5678', taxId: '27987654321' },
     { id: '3', name: 'Empresa Demo S.A.', email: 'contacto@demo.com', phone: '555-9999', taxId: '30112233445', address: 'Av. Siempre Viva 123' },
+];
+
+export const MOCK_BRANCHES: Branch[] = [
+  { 
+    id: '1', 
+    name: 'Casa Central', 
+    address: 'Av. Alem 1250, San Miguel de Tucumán', 
+    phone: '3814123456', 
+    email: 'central@empresa.com', 
+    status: 'active', 
+    isMain: true 
+  },
+  { 
+    id: '2', 
+    name: 'Sucursal Norte', 
+    address: 'Av. Siria 2500, San Miguel de Tucumán', 
+    phone: '3814789012', 
+    email: 'norte@empresa.com', 
+    status: 'active' 
+  },
+  { 
+    id: '3', 
+    name: 'Sucursal Sur', 
+    address: 'Av. Colón 800, San Miguel de Tucumán', 
+    phone: '3814345678', 
+    email: 'sur@empresa.com', 
+    status: 'active' 
+  },
+  { 
+    id: '4', 
+    name: 'Sucursal Este', 
+    address: 'Av. Belgrano 2200, San Miguel de Tucumán', 
+    phone: '3814901234', 
+    email: 'este@empresa.com', 
+    status: 'active' 
+  },
+  { 
+    id: '5', 
+    name: 'Sucursal Oeste', 
+    address: 'Av. Mate de Luna 1800, San Miguel de Tucumán', 
+    phone: '3814567890', 
+    email: 'oeste@empresa.com', 
+    status: 'active' 
+  },
+  {
+    id: '6', 
+    name: 'Sucursal de Prueba', 
+    address: 'Juan padros 4800', 
+    phone: '3333333', 
+    email: 'prueba@mail.com', 
+    status: 'inactive'
+  }
 ];
 
 export const AVAILABLE_BRANCHES = [

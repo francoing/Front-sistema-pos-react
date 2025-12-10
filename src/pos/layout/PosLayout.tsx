@@ -1,6 +1,7 @@
 
+
 import React from 'react';
-import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard, Package, Contact } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard, Package, Contact, Building2 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from '../../components/SidebarItem';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -44,6 +45,13 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
                 onClick={() => navigate('/dashboard')} 
                 />
                 
+                <SidebarItem 
+                icon={Building2} 
+                label="Sucursales" 
+                isActive={isActive('/branches')} 
+                onClick={() => navigate('/branches')} 
+                />
+
                 <SidebarItem 
                 icon={Package} 
                 label="Inventario" 

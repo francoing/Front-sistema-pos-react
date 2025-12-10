@@ -1,4 +1,5 @@
 
+
 export enum Category {
   CAFE = 'Café',
   POSTRES = 'Postres',
@@ -62,4 +63,14 @@ export interface Client {
   taxId?: string; // DNI, RUT, CUIT
   address?: string;
   notes?: string;
+}
+
+export interface Branch {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  status: 'active' | 'inactive';
+  isMain?: boolean;
 }

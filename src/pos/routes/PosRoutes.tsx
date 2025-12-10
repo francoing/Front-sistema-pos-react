@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PosLayout } from '../layout/PosLayout';
@@ -9,6 +10,7 @@ import { UsersPage } from '../pages/UsersPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { ProductsPage } from '../pages/ProductsPage';
 import { ClientsPage } from '../pages/ClientsPage';
+import { BranchesPage } from '../pages/BranchesPage';
 import { BranchSelectionPage } from '../pages/BranchSelectionPage';
 import { useAuthStore } from '../../hooks/useAuthStore';
 
@@ -30,6 +32,7 @@ export const PosRoutes = () => {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/clients" element={<ClientsPage />} />
+        <Route path="/branches" element={<BranchesPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/close" element={<CloseRegisterPage />} />
         <Route path="/users" element={<UsersPage />} />

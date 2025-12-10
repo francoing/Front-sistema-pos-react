@@ -1,7 +1,8 @@
 
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { CartItem, Sale, User, Product, GeminiAnalysis, Client } from '../types';
-import { MOCK_USERS, MOCK_PRODUCTS, MOCK_CLIENTS } from '../constants';
+import { CartItem, Sale, User, Product, GeminiAnalysis, Client, Branch } from '../types';
+import { MOCK_USERS, MOCK_PRODUCTS, MOCK_CLIENTS, MOCK_BRANCHES } from '../constants';
 import { analyzeCartAndGenerateReceipt } from '../services/geminiService';
 
 // --- State Interface ---
@@ -11,6 +12,7 @@ interface PosState {
     users: User[];
     products: Product[];
     clients: Client[];
+    branches: Branch[];
     geminiAnalysis: GeminiAnalysis | null;
     isAnalyzing: boolean;
 }
@@ -22,6 +24,7 @@ const initialState: PosState = {
     users: MOCK_USERS,
     products: MOCK_PRODUCTS,
     clients: MOCK_CLIENTS,
+    branches: MOCK_BRANCHES,
     geminiAnalysis: null,
     isAnalyzing: false,
 };
@@ -150,6 +153,19 @@ export const posSlice = createSlice({
         },
         deleteClient: (state, action: PayloadAction<string>) => {
             state.clients = state.clients.filter(c => c.id !== action.payload);
+        },
+        // --- Branch / Sucursales Management ---
+        saveBranch: (state, action: PayloadAction<Branch>) => {
+            const branch = action.payload;
+            const index = state.branches.findIndex(b => b.id === branch.id);
+            if (index >= 0) {
+                state.branches[index] = branch;
+            } else {
+                state.branches.unshift(branch);
+            }
+        },
+        deleteBranch: (state, action: PayloadAction<string>) => {
+            state.branches = state.branches.filter(b => b.id !== action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -195,5 +211,7 @@ export const {
     saveProduct,
     deleteProduct,
     saveClient,
-    deleteClient
+    deleteClient,
+    saveBranch,
+    deleteBranch
 } = posSlice.actions;

@@ -1,4 +1,5 @@
 
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { 
@@ -14,10 +15,12 @@ import {
     deleteProduct,
     saveClient,
     deleteClient,
+    saveBranch,
+    deleteBranch,
     generateAnalysis,
     handleCheckout
 } from '../store/posSlice';
-import { Product, User, Client } from '../types';
+import { Product, User, Client, Branch } from '../types';
 
 export const usePosStore = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -27,6 +30,7 @@ export const usePosStore = () => {
         users, 
         products,
         clients,
+        branches,
         geminiAnalysis, 
         isAnalyzing 
     } = useSelector((state: RootState) => state.pos);
@@ -48,6 +52,7 @@ export const usePosStore = () => {
         users,
         products,
         clients,
+        branches,
         geminiAnalysis,
         isAnalyzing,
 
@@ -68,6 +73,10 @@ export const usePosStore = () => {
         // Client Management
         saveClient: (client: Client) => dispatch(saveClient(client)),
         deleteClient: (id: string) => dispatch(deleteClient(id)),
+
+        // Branch Management
+        saveBranch: (branch: Branch) => dispatch(saveBranch(branch)),
+        deleteBranch: (id: string) => dispatch(deleteBranch(id)),
         
         // Async Actions
         generateAnalysis: () => dispatch(generateAnalysis(cart)),
