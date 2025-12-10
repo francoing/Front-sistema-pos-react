@@ -1,6 +1,6 @@
 
 
-import { Product, Category, User, Client, Branch } from './types';
+import { Product, Category, User, Client, Branch, CashRegister, CashSession } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   // --- CAFÉ ---
@@ -357,6 +357,47 @@ export const MOCK_BRANCHES: Branch[] = [
     phone: '3333333', 
     email: 'prueba@mail.com', 
     status: 'inactive'
+  }
+];
+
+export const MOCK_CASH_REGISTERS: CashRegister[] = [
+  { id: '1', name: 'Caja 01', branchId: '1', branchName: 'Casa Central', status: 'closed' },
+  { id: '2', name: 'Caja 02', branchId: '1', branchName: 'Casa Central', status: 'closed' },
+  { id: '3', name: 'Caja 01', branchId: '2', branchName: 'Sucursal Norte', status: 'closed' },
+  { id: '4', name: 'Caja 02', branchId: '2', branchName: 'Sucursal Norte', status: 'closed' },
+  { id: '5', name: 'Caja 01', branchId: '3', branchName: 'Sucursal Sur', status: 'open' },
+  { id: '6', name: 'Caja 02', branchId: '3', branchName: 'Sucursal Sur', status: 'closed' },
+  { id: '7', name: 'Caja 01', branchId: '4', branchName: 'Sucursal Este', status: 'closed' },
+  { id: '8', name: 'Caja 02', branchId: '4', branchName: 'Sucursal Este', status: 'closed' },
+  { id: '9', name: 'Caja 01', branchId: '5', branchName: 'Sucursal Oeste', status: 'closed' },
+  { id: '10', name: 'Caja 02', branchId: '5', branchName: 'Sucursal Oeste', status: 'closed' },
+];
+
+export const MOCK_CASH_SESSIONS: CashSession[] = [
+  {
+    id: 'SES-001',
+    userId: '6',
+    userName: 'Roberto Gómez',
+    registerId: '5',
+    registerName: 'Caja 01',
+    branchName: 'Sucursal Sur',
+    startTime: new Date(new Date().setHours(8, 0, 0)),
+    initialCash: 5000,
+    status: 'open'
+  },
+  {
+    id: 'SES-000',
+    userId: '6',
+    userName: 'Roberto Gómez',
+    registerId: '5',
+    registerName: 'Caja 01',
+    branchName: 'Sucursal Sur',
+    startTime: new Date(new Date().setDate(new Date().getDate() - 1)),
+    endTime: new Date(new Date().setDate(new Date().getDate() - 1)),
+    initialCash: 5000,
+    finalCash: 48500,
+    expectedCash: 48500,
+    status: 'closed'
   }
 ];
 

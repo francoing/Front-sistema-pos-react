@@ -1,7 +1,5 @@
-
-
 import React from 'react';
-import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard, Package, Contact, Building2 } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard, Package, Contact, Building2, Monitor, Wallet, FileBarChart } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from '../../components/SidebarItem';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -53,12 +51,44 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
                 />
 
                 <SidebarItem 
+                  icon={Monitor} 
+                  label="Cajas" 
+                  isActive={isActive('/cash-registers')} 
+                  onClick={() => navigate('/cash-registers')} 
+                />
+
+                <SidebarItem 
+                  icon={Wallet} 
+                  label="Sesiones" 
+                  isActive={isActive('/cash-sessions')} 
+                  onClick={() => navigate('/cash-sessions')} 
+                />
+
+                <SidebarItem 
                 icon={Package} 
                 label="Inventario" 
                 isActive={isActive('/products')} 
                 onClick={() => navigate('/products')} 
                 />
+
+                <SidebarItem 
+                icon={FileBarChart} 
+                label="Reportes" 
+                isActive={isActive('/reports')} 
+                onClick={() => navigate('/reports')} 
+                />
             </>
+          )}
+
+          {/* Cashiers also need to see sessions usually, or at least open theirs. 
+              If logic restricts, move out of isAdmin block */}
+          {!isAdmin && (
+               <SidebarItem 
+               icon={Wallet} 
+               label="Sesiones" 
+               isActive={isActive('/cash-sessions')} 
+               onClick={() => navigate('/cash-sessions')} 
+             />
           )}
 
           <SidebarItem 
@@ -113,6 +143,14 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
                 mobile
             />
           )}
+          
+          <SidebarItem 
+            icon={Wallet} 
+            label="Sesiones" 
+            isActive={isActive('/cash-sessions')} 
+            onClick={() => navigate('/cash-sessions')} 
+            mobile
+          />
 
           <SidebarItem 
             icon={Contact} 
@@ -129,7 +167,6 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
             onClick={() => navigate('/history')} 
             mobile
           />
-          {/* Hidden items on mobile to fit screen, or add more scroll logic */}
       </div>
     </div>
   );

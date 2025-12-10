@@ -1,8 +1,10 @@
 
 
+
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { CartItem, Sale, User, Product, GeminiAnalysis, Client, Branch } from '../types';
-import { MOCK_USERS, MOCK_PRODUCTS, MOCK_CLIENTS, MOCK_BRANCHES } from '../constants';
+import { CartItem, Sale, User, Product, GeminiAnalysis, Client, Branch, CashRegister, CashSession } from '../types';
+import { MOCK_USERS, MOCK_PRODUCTS, MOCK_CLIENTS, MOCK_BRANCHES, MOCK_CASH_REGISTERS, MOCK_CASH_SESSIONS } from '../constants';
 import { analyzeCartAndGenerateReceipt } from '../services/geminiService';
 
 // --- State Interface ---
@@ -13,6 +15,8 @@ interface PosState {
     products: Product[];
     clients: Client[];
     branches: Branch[];
+    cashRegisters: CashRegister[];
+    cashSessions: CashSession[];
     geminiAnalysis: GeminiAnalysis | null;
     isAnalyzing: boolean;
 }
@@ -25,6 +29,8 @@ const initialState: PosState = {
     products: MOCK_PRODUCTS,
     clients: MOCK_CLIENTS,
     branches: MOCK_BRANCHES,
+    cashRegisters: MOCK_CASH_REGISTERS,
+    cashSessions: MOCK_CASH_SESSIONS,
     geminiAnalysis: null,
     isAnalyzing: false,
 };
@@ -166,6 +172,42 @@ export const posSlice = createSlice({
         },
         deleteBranch: (state, action: PayloadAction<string>) => {
             state.branches = state.branches.filter(b => b.id !== action.payload);
+        },
+        // --- Cash Registers Management ---
+        saveCashRegister: (state, action: PayloadAction<CashRegister>) => {
+            const reg = action.payload;
+            const index = state.cashRegisters.findIndex(r => r.id === reg.id);
+            if (index >= 0) {
+                state.cashRegisters[index] = reg;
+            } else {
+                state.cashRegisters.unshift(reg);
+            }
+        },
+        deleteCashRegister: (state, action: PayloadAction<string>) => {
+            state.cashRegisters = state.cashRegisters.filter(r => r.id !== action.payload);
+        },
+        openAllCashRegisters: (state) => {
+            state.cashRegisters.forEach(reg => {
+                reg.status = 'open';
+            });
+        },
+        // --- Cash Sessions Management ---
+        openCashSession: (state, action: PayloadAction<CashSession>) => {
+            state.cashSessions.unshift(action.payload);
+            // Also update register status
+            const reg = state.cashRegisters.find(r => r.id === action.payload.registerId);
+            if (reg) reg.status = 'open';
+        },
+        closeCashSession: (state, action: PayloadAction<{id: string, finalCash: number}>) => {
+             const session = state.cashSessions.find(s => s.id === action.payload.id);
+             if (session) {
+                 session.status = 'closed';
+                 session.finalCash = action.payload.finalCash;
+                 session.endTime = new Date();
+                 // Update register status
+                 const reg = state.cashRegisters.find(r => r.id === session.registerId);
+                 if (reg) reg.status = 'closed';
+             }
         }
     },
     extraReducers: (builder) => {
@@ -213,5 +255,10 @@ export const {
     saveClient,
     deleteClient,
     saveBranch,
-    deleteBranch
+    deleteBranch,
+    saveCashRegister,
+    deleteCashRegister,
+    openAllCashRegisters,
+    openCashSession,
+    closeCashSession
 } = posSlice.actions;

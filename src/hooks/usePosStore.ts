@@ -1,5 +1,7 @@
 
 
+
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { 
@@ -17,10 +19,15 @@ import {
     deleteClient,
     saveBranch,
     deleteBranch,
+    saveCashRegister,
+    deleteCashRegister,
+    openAllCashRegisters,
+    openCashSession,
+    closeCashSession,
     generateAnalysis,
     handleCheckout
 } from '../store/posSlice';
-import { Product, User, Client, Branch } from '../types';
+import { Product, User, Client, Branch, CashRegister, CashSession } from '../types';
 
 export const usePosStore = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -31,6 +38,8 @@ export const usePosStore = () => {
         products,
         clients,
         branches,
+        cashRegisters,
+        cashSessions,
         geminiAnalysis, 
         isAnalyzing 
     } = useSelector((state: RootState) => state.pos);
@@ -53,6 +62,8 @@ export const usePosStore = () => {
         products,
         clients,
         branches,
+        cashRegisters,
+        cashSessions,
         geminiAnalysis,
         isAnalyzing,
 
@@ -77,6 +88,15 @@ export const usePosStore = () => {
         // Branch Management
         saveBranch: (branch: Branch) => dispatch(saveBranch(branch)),
         deleteBranch: (id: string) => dispatch(deleteBranch(id)),
+
+        // Cash Registers
+        saveCashRegister: (reg: CashRegister) => dispatch(saveCashRegister(reg)),
+        deleteCashRegister: (id: string) => dispatch(deleteCashRegister(id)),
+        openAllCashRegisters: () => dispatch(openAllCashRegisters()),
+
+        // Cash Sessions
+        openCashSession: (session: CashSession) => dispatch(openCashSession(session)),
+        closeCashSession: (id: string, finalCash: number) => dispatch(closeCashSession({ id, finalCash })),
         
         // Async Actions
         generateAnalysis: () => dispatch(generateAnalysis(cart)),
