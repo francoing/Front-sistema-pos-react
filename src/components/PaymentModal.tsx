@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, User, CheckCircle2, QrCode, Loader2, ArrowLeft } from 'lucide-react';
-import { GeminiAnalysis } from '../types';
+import { X, Sparkles, User, CheckCircle2, QrCode, Loader2, ArrowLeft, Search, Plus } from 'lucide-react';
+import { GeminiAnalysis, Client } from '../types';
+import { usePosStore } from '../hooks/usePosStore';
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   total: number;
-  onConfirm: (method: 'cash' | 'card' | 'transfer' | 'qr', customer: string) => void;
+  onConfirm: (method: 'cash' | 'card' | 'transfer' | 'qr', customer: string, clientId?: string) => void;
   isProcessing: boolean;
   geminiAnalysis: GeminiAnalysis | null;
 }
@@ -20,12 +21,23 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   isProcessing,
   geminiAnalysis 
 }) => {
+  const { clients } = usePosStore();
   const [method, setMethod] = useState<'cash' | 'card' | 'transfer' | 'qr'>('card');
-  const [customer, setCustomer] = useState('Consumidor Final');
+  
+  // Client selection state
+  const [clientSearch, setClientSearch] = useState('');
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   
   // States for QR Logic
   const [isQrStep, setIsQrStep] = useState(false);
   const [qrStatus, setQrStatus] = useState<'generating' | 'waiting' | 'approved'>('generating');
+
+  // Filter clients
+  const filteredClients = clientSearch ? clients.filter(c => 
+      c.name.toLowerCase().includes(clientSearch.toLowerCase()) || 
+      c.taxId?.includes(clientSearch)
+  ) : [];
 
   // Reset states when opening
   useEffect(() => {
@@ -33,6 +45,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         setMethod('card');
         setIsQrStep(false);
         setQrStatus('generating');
+        setClientSearch('');
+        setSelectedClient(null);
+        setShowDropdown(false);
     }
   }, [isOpen]);
 
@@ -54,11 +69,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             setQrStatus('approved');
             // Auto-close after approval animation
             setTimeout(() => {
-                onConfirm('qr', customer);
+                handleConfirm();
             }, 1000);
         }, 5000);
     }, 800);
   };
+
+  const handleConfirm = () => {
+      // If a client is selected, use their name. If not, use the search text as "Guest Name" or default.
+      const customerName = selectedClient ? selectedClient.name : (clientSearch || "Consumidor Final");
+      const customerId = selectedClient?.id;
+      onConfirm(method, customerName, customerId);
+  }
 
   const getQRUrl = (amount: number) => {
     // Generates a QR code image using a public API for demo purposes
@@ -66,6 +88,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     const data = `MERCPAGO_POS_FIXED_AMOUNT_${amount.toFixed(2)}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data)}&color=009ee3`;
   };
+
+  const selectClient = (client: Client) => {
+      setSelectedClient(client);
+      setClientSearch(client.name);
+      setShowDropdown(false);
+  }
 
   if (!isOpen) return null;
 
@@ -96,7 +124,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-4 md:p-6 space-y-6 overflow-y-auto">
+        <div className="p-4 md:p-6 space-y-6 overflow-y-auto overflow-x-visible">
           
           {/* QR View */}
           {isQrStep ? (
@@ -155,16 +183,50 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     </div>
                 )}
 
-                <div className="space-y-3">
+                {/* Client Search */}
+                <div className="space-y-3 relative z-50">
                     <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cliente</label>
                     <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
                         <input 
-                        type="text" 
-                        value={customer}
-                        onChange={(e) => setCustomer(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-700 font-medium"
+                            type="text" 
+                            value={clientSearch}
+                            onChange={(e) => {
+                                setClientSearch(e.target.value);
+                                setSelectedClient(null); // Reset selection if typing
+                                setShowDropdown(true);
+                            }}
+                            onFocus={() => setShowDropdown(true)}
+                            placeholder="Buscar cliente o ingresar nuevo..."
+                            className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-700 font-medium ${selectedClient ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200'}`}
                         />
+                        {selectedClient && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded">
+                                Registrado
+                            </div>
+                        )}
+                        
+                        {/* Dropdown results */}
+                        {showDropdown && clientSearch && !selectedClient && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50">
+                                {filteredClients.length > 0 ? (
+                                    filteredClients.map(client => (
+                                        <button
+                                            key={client.id}
+                                            onClick={() => selectClient(client)}
+                                            className="w-full text-left px-4 py-3 hover:bg-slate-50 flex flex-col border-b border-slate-50 last:border-0"
+                                        >
+                                            <span className="font-bold text-slate-800 text-sm">{client.name}</span>
+                                            {client.taxId && <span className="text-xs text-slate-400">ID: {client.taxId}</span>}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="p-3 text-sm text-slate-500 text-center italic">
+                                        No se encontró. Se usará como "Consumidor Final" o nombre libre.
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -206,7 +268,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           {!isQrStep ? (
              <button
                 disabled={isProcessing}
-                onClick={() => method === 'qr' ? handleGenerateQR() : onConfirm(method, customer)}
+                onClick={() => method === 'qr' ? handleGenerateQR() : handleConfirm()}
                 className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2
                     ${method === 'qr' 
                         ? 'bg-blue-500 hover:bg-blue-600 shadow-blue-200 text-white' 

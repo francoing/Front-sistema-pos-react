@@ -1,3 +1,4 @@
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { 
@@ -9,10 +10,14 @@ import {
     closeDay, 
     saveUser, 
     deleteUser,
+    saveProduct,
+    deleteProduct,
+    saveClient,
+    deleteClient,
     generateAnalysis,
     handleCheckout
 } from '../store/posSlice';
-import { Product, User } from '../types';
+import { Product, User, Client } from '../types';
 
 export const usePosStore = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -20,14 +25,15 @@ export const usePosStore = () => {
         cart, 
         salesHistory, 
         users, 
-        products, 
+        products,
+        clients,
         geminiAnalysis, 
         isAnalyzing 
     } = useSelector((state: RootState) => state.pos);
 
     // Wrapper to match previous API expected by components
-    const handleCheckoutWrapper = async (method: 'cash' | 'card' | 'transfer' | 'qr', customer: string) => {
-        const resultAction = await dispatch(handleCheckout({ method, customer }));
+    const handleCheckoutWrapper = async (method: 'cash' | 'card' | 'transfer' | 'qr', customer: string, clientId?: string) => {
+        const resultAction = await dispatch(handleCheckout({ method, customer, clientId }));
         if (handleCheckout.fulfilled.match(resultAction)) {
             return resultAction.payload;
         } else {
@@ -41,6 +47,7 @@ export const usePosStore = () => {
         salesHistory,
         users,
         products,
+        clients,
         geminiAnalysis,
         isAnalyzing,
 
@@ -53,6 +60,14 @@ export const usePosStore = () => {
         handleCloseDay: () => dispatch(closeDay()),
         saveUser: (user: User) => dispatch(saveUser(user)),
         deleteUser: (id: string) => dispatch(deleteUser(id)),
+        
+        // Product Management
+        saveProduct: (product: Product) => dispatch(saveProduct(product)),
+        deleteProduct: (id: string) => dispatch(deleteProduct(id)),
+
+        // Client Management
+        saveClient: (client: Client) => dispatch(saveClient(client)),
+        deleteClient: (id: string) => dispatch(deleteClient(id)),
         
         // Async Actions
         generateAnalysis: () => dispatch(generateAnalysis(cart)),

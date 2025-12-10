@@ -1,6 +1,7 @@
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { CartItem, Sale, User, Product, GeminiAnalysis } from '../types';
-import { MOCK_USERS, MOCK_PRODUCTS } from '../constants';
+import { CartItem, Sale, User, Product, GeminiAnalysis, Client } from '../types';
+import { MOCK_USERS, MOCK_PRODUCTS, MOCK_CLIENTS } from '../constants';
 import { analyzeCartAndGenerateReceipt } from '../services/geminiService';
 
 // --- State Interface ---
@@ -9,6 +10,7 @@ interface PosState {
     salesHistory: Sale[];
     users: User[];
     products: Product[];
+    clients: Client[];
     geminiAnalysis: GeminiAnalysis | null;
     isAnalyzing: boolean;
 }
@@ -19,6 +21,7 @@ const initialState: PosState = {
     salesHistory: [],
     users: MOCK_USERS,
     products: MOCK_PRODUCTS,
+    clients: MOCK_CLIENTS,
     geminiAnalysis: null,
     isAnalyzing: false,
 };
@@ -38,7 +41,7 @@ export const generateAnalysis = createAsyncThunk(
 // 2. Checkout Thunk
 export const handleCheckout = createAsyncThunk(
     'pos/checkout',
-    async (payload: { method: 'cash' | 'card' | 'transfer' | 'qr', customer: string }, { getState }) => {
+    async (payload: { method: 'cash' | 'card' | 'transfer' | 'qr', customer: string, clientId?: string }, { getState }) => {
         const state = getState() as { pos: PosState };
         const { cart, geminiAnalysis } = state.pos;
 
@@ -60,6 +63,7 @@ export const handleCheckout = createAsyncThunk(
             total,
             paymentMethod: payload.method,
             customerName: payload.customer || "Cliente General",
+            clientId: payload.clientId,
             aiMessage: finalNote
         };
 
@@ -120,6 +124,32 @@ export const posSlice = createSlice({
         },
         deleteUser: (state, action: PayloadAction<string>) => {
             state.users = state.users.filter(u => u.id !== action.payload);
+        },
+        // --- Product / Inventory Management ---
+        saveProduct: (state, action: PayloadAction<Product>) => {
+            const product = action.payload;
+            const index = state.products.findIndex(p => p.id === product.id);
+            if (index >= 0) {
+                state.products[index] = product;
+            } else {
+                state.products.unshift(product);
+            }
+        },
+        deleteProduct: (state, action: PayloadAction<string>) => {
+            state.products = state.products.filter(p => p.id !== action.payload);
+        },
+        // --- Client / CRM Management ---
+        saveClient: (state, action: PayloadAction<Client>) => {
+            const client = action.payload;
+            const index = state.clients.findIndex(c => c.id === client.id);
+            if (index >= 0) {
+                state.clients[index] = client;
+            } else {
+                state.clients.unshift(client);
+            }
+        },
+        deleteClient: (state, action: PayloadAction<string>) => {
+            state.clients = state.clients.filter(c => c.id !== action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -140,6 +170,14 @@ export const posSlice = createSlice({
             state.salesHistory.unshift(action.payload);
             state.cart = [];
             state.geminiAnalysis = null;
+            
+            // Decrease stock
+            action.payload.items.forEach(cartItem => {
+                const product = state.products.find(p => p.id === cartItem.id);
+                if (product && product.stock !== undefined) {
+                    product.stock = Math.max(0, product.stock - cartItem.quantity);
+                }
+            });
         });
     }
 });
@@ -153,5 +191,9 @@ export const {
     deleteSale, 
     closeDay, 
     saveUser, 
-    deleteUser 
+    deleteUser,
+    saveProduct,
+    deleteProduct,
+    saveClient,
+    deleteClient
 } = posSlice.actions;

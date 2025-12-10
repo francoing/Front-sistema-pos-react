@@ -2,10 +2,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { startLogin, startLogout, checkAuthToken } from '../store/auth/thunks';
-import { clearErrorMessage } from '../store/auth/authSlice';
+import { clearErrorMessage, onSelectBranch } from '../store/auth/authSlice';
 
 export const useAuthStore = () => {
-    const { status, user, errorMessage } = useSelector((state: RootState) => state.auth);
+    const { status, user, selectedBranch, errorMessage } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
 
     const login = (email: string, pass: string) => {
@@ -20,6 +20,10 @@ export const useAuthStore = () => {
         dispatch(checkAuthToken());
     }
 
+    const selectBranch = (branchName: string) => {
+        dispatch(onSelectBranch(branchName));
+    }
+
     const clearError = () => {
         dispatch(clearErrorMessage());
     }
@@ -28,12 +32,14 @@ export const useAuthStore = () => {
         // Properties
         status,
         user,
+        selectedBranch,
         errorMessage,
 
         // Methods
         login,
         logout,
         checkAuth,
+        selectBranch,
         clearError
     }
 }

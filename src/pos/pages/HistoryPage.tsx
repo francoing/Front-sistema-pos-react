@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Search, History, Filter, FileText, Printer, Trash2 } from 'lucide-react';
 import { usePosStore } from '../../hooks/usePosStore';
@@ -102,21 +103,21 @@ export const HistoryPage = () => {
                         <div className="flex items-center justify-end gap-2">
                             <button 
                             onClick={() => handleReprint(sale)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                            className="p-2 bg-slate-100 text-indigo-600 hover:bg-slate-200 rounded-lg transition-colors shadow-sm"
                             title="Ver Ticket / PDF"
                             >
                             <FileText size={18} />
                             </button>
                             <button 
                             onClick={() => handleReprint(sale)}
-                            className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all"
+                            className="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors shadow-sm"
                             title="Reimprimir"
                             >
                             <Printer size={18} />
                             </button>
                             <button 
                             onClick={() => onDelete(sale.id)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
                             title="Eliminar Comprobante"
                             >
                             <Trash2 size={18} />

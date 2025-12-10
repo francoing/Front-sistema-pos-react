@@ -5,12 +5,14 @@ import { User } from '../../types';
 interface AuthState {
     status: 'checking' | 'authenticated' | 'not-authenticated';
     user: User | null;
+    selectedBranch: string | null;
     errorMessage: string | null;
 }
 
 const initialState: AuthState = {
     status: 'checking', // 'checking', 'authenticated', 'not-authenticated'
     user: null,
+    selectedBranch: null,
     errorMessage: null,
 };
 
@@ -21,6 +23,7 @@ export const authSlice = createSlice({
         onChecking: (state) => {
             state.status = 'checking';
             state.user = null;
+            state.selectedBranch = null;
             state.errorMessage = null;
         },
         onLogin: (state, action: PayloadAction<User>) => {
@@ -28,9 +31,13 @@ export const authSlice = createSlice({
             state.user = action.payload;
             state.errorMessage = null;
         },
+        onSelectBranch: (state, action: PayloadAction<string>) => {
+            state.selectedBranch = action.payload;
+        },
         onLogout: (state, action: PayloadAction<string | null>) => {
             state.status = 'not-authenticated';
             state.user = null;
+            state.selectedBranch = null;
             state.errorMessage = action.payload || null;
         },
         clearErrorMessage: (state) => {
@@ -39,4 +46,4 @@ export const authSlice = createSlice({
     }
 });
 
-export const { onChecking, onLogin, onLogout, clearErrorMessage } = authSlice.actions;
+export const { onChecking, onLogin, onSelectBranch, onLogout, clearErrorMessage } = authSlice.actions;

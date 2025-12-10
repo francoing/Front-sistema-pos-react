@@ -1,4 +1,5 @@
-import { Product, Category, User } from './types';
+
+import { Product, Category, User, Client } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   // --- CAFÉ ---
@@ -8,7 +9,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 4.50,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-amber-100'
+    color: 'bg-amber-100',
+    sku: 'CAF-001',
+    stock: 150,
+    status: 'active'
   },
   {
     id: '2',
@@ -16,7 +20,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.00,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1570968992193-6e5c922e5363?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-orange-100'
+    color: 'bg-orange-100',
+    sku: 'CAF-002',
+    stock: 80,
+    status: 'active'
   },
   {
     id: '3',
@@ -24,7 +31,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 3.50,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-stone-100'
+    color: 'bg-stone-100',
+    sku: 'CAF-003',
+    stock: 200,
+    status: 'active'
   },
   {
     id: '9',
@@ -32,7 +42,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.25,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-emerald-100'
+    color: 'bg-emerald-100',
+    sku: 'TEA-001',
+    stock: 45,
+    status: 'active'
   },
   {
     id: '11',
@@ -40,7 +53,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.75,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-amber-50'
+    color: 'bg-amber-50',
+    sku: 'CAF-004',
+    stock: 0,
+    status: 'draft'
   },
   {
     id: '12',
@@ -48,7 +64,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 4.25,
     category: Category.CAFE,
     image: 'https://images.unsplash.com/photo-1517701604599-bb29b5dd7359?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-stone-200'
+    color: 'bg-stone-200',
+    sku: 'CAF-005',
+    stock: 12,
+    status: 'active'
   },
 
   // --- POSTRES ---
@@ -58,7 +77,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 6.50,
     category: Category.POSTRES,
     image: 'https://images.unsplash.com/photo-1524351199678-941a58a3dfcd?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-pink-100'
+    color: 'bg-pink-100',
+    sku: 'PST-001',
+    stock: 20,
+    status: 'active'
   },
   {
     id: '8',
@@ -66,7 +88,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.50,
     category: Category.POSTRES,
     image: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-neutral-200'
+    color: 'bg-neutral-200',
+    sku: 'PST-002',
+    stock: 15,
+    status: 'active'
   },
   {
     id: '13',
@@ -74,7 +99,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.00,
     category: Category.POSTRES,
     image: 'https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-yellow-50'
+    color: 'bg-yellow-50',
+    sku: 'PST-003',
+    stock: 5,
+    status: 'active'
   },
   {
     id: '14',
@@ -82,7 +110,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 3.50,
     category: Category.POSTRES,
     image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-purple-100'
+    color: 'bg-purple-100',
+    sku: 'PST-004',
+    stock: 30,
+    status: 'active'
   },
   {
     id: '15',
@@ -90,7 +121,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 2.50,
     category: Category.POSTRES,
     image: 'https://images.unsplash.com/photo-1499636138143-bd649043ea52?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-orange-50'
+    color: 'bg-orange-50',
+    sku: 'PST-005',
+    stock: 100,
+    status: 'active'
   },
 
   // --- COMIDA ---
@@ -100,7 +134,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 3.00,
     category: Category.COMIDA,
     image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-yellow-100'
+    color: 'bg-yellow-100',
+    sku: 'FOD-001',
+    stock: 40,
+    status: 'active'
   },
   {
     id: '6',
@@ -108,7 +145,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 8.50,
     category: Category.COMIDA,
     image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-green-100'
+    color: 'bg-green-100',
+    sku: 'FOD-002',
+    stock: 25,
+    status: 'active'
   },
   {
     id: '16',
@@ -116,7 +156,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 9.00,
     category: Category.COMIDA,
     image: 'https://images.unsplash.com/photo-1519340333755-56e9c1d04579?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-orange-50'
+    color: 'bg-orange-50',
+    sku: 'FOD-003',
+    stock: 10,
+    status: 'active'
   },
   {
     id: '17',
@@ -124,7 +167,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 7.50,
     category: Category.COMIDA,
     image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-green-50'
+    color: 'bg-green-50',
+    sku: 'FOD-004',
+    stock: 15,
+    status: 'active'
   },
   {
     id: '18',
@@ -132,7 +178,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 6.00,
     category: Category.COMIDA,
     image: 'https://images.unsplash.com/photo-1588137372308-15f75323a51d?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-green-100'
+    color: 'bg-green-100',
+    sku: 'FOD-005',
+    stock: 20,
+    status: 'active'
   },
 
   // --- BEBIDAS ---
@@ -142,7 +191,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 4.00,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-orange-200'
+    color: 'bg-orange-200',
+    sku: 'DRK-001',
+    stock: 60,
+    status: 'active'
   },
   {
     id: '10',
@@ -150,7 +202,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 2.00,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1560023907-5f339617ea30?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-blue-100'
+    color: 'bg-blue-100',
+    sku: 'DRK-002',
+    stock: 200,
+    status: 'active'
   },
   {
     id: '19',
@@ -158,7 +213,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 5.50,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-green-200'
+    color: 'bg-green-200',
+    sku: 'DRK-003',
+    stock: 35,
+    status: 'active'
   },
   {
     id: '20',
@@ -166,7 +224,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 3.50,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-pink-200'
+    color: 'bg-pink-200',
+    sku: 'DRK-004',
+    stock: 40,
+    status: 'active'
   },
   {
     id: '21',
@@ -174,7 +235,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 2.50,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-red-100'
+    color: 'bg-red-100',
+    sku: 'DRK-005',
+    stock: 120,
+    status: 'active'
   },
     {
     id: '22',
@@ -182,7 +246,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 3.00,
     category: Category.BEBIDAS,
     image: 'https://images.unsplash.com/photo-1547827800-410a569769da?auto=format&fit=crop&w=400&q=80',
-    color: 'bg-stone-50'
+    color: 'bg-stone-50',
+    sku: 'DRK-006',
+    stock: 50,
+    status: 'active'
   }
 ];
 
@@ -232,6 +299,12 @@ export const MOCK_USERS: User[] = [
     status: 'active',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   }
+];
+
+export const MOCK_CLIENTS: Client[] = [
+    { id: '1', name: 'Juan Pérez', email: 'juan@gmail.com', phone: '555-1234', taxId: '20123456789' },
+    { id: '2', name: 'María Gonzalez', email: 'maria@hotmail.com', phone: '555-5678', taxId: '27987654321' },
+    { id: '3', name: 'Empresa Demo S.A.', email: 'contacto@demo.com', phone: '555-9999', taxId: '30112233445', address: 'Av. Siempre Viva 123' },
 ];
 
 export const AVAILABLE_BRANCHES = [

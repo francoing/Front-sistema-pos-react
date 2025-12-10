@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, History, PieChart, Users, LayoutDashboard, Package, Contact } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from '../../components/SidebarItem';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -21,8 +21,8 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-100 overflow-hidden font-sans text-slate-800">
       {/* Sidebar - Desktop */}
-      <div className="hidden md:flex w-24 bg-slate-900 flex-col items-center py-6 px-2 flex-shrink-0 z-20">
-        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-900/50">
+      <div className="hidden md:flex w-24 bg-slate-900 flex-col items-center py-6 px-2 flex-shrink-0 z-20 overflow-y-auto no-scrollbar">
+        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-900/50 shrink-0">
           <LayoutGrid className="text-white" />
         </div>
         
@@ -36,13 +36,29 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
           />
 
           {isAdmin && (
-            <SidebarItem 
-              icon={LayoutDashboard} 
-              label="Dash" 
-              isActive={isActive('/dashboard')} 
-              onClick={() => navigate('/dashboard')} 
-            />
+            <>
+                <SidebarItem 
+                icon={LayoutDashboard} 
+                label="Dash" 
+                isActive={isActive('/dashboard')} 
+                onClick={() => navigate('/dashboard')} 
+                />
+                
+                <SidebarItem 
+                icon={Package} 
+                label="Inventario" 
+                isActive={isActive('/products')} 
+                onClick={() => navigate('/products')} 
+                />
+            </>
           )}
+
+          <SidebarItem 
+            icon={Contact} 
+            label="Clientes" 
+            isActive={isActive('/clients')} 
+            onClick={() => navigate('/clients')} 
+          />
 
           <SidebarItem 
             icon={History} 
@@ -91,26 +107,21 @@ export const PosLayout = ({ children }: { children?: React.ReactNode }) => {
           )}
 
           <SidebarItem 
+            icon={Contact} 
+            label="Clientes" 
+            isActive={isActive('/clients')} 
+            onClick={() => navigate('/clients')} 
+            mobile
+          />
+
+          <SidebarItem 
             icon={History} 
             label="Historial" 
             isActive={isActive('/history')} 
             onClick={() => navigate('/history')} 
             mobile
           />
-          <SidebarItem 
-            icon={PieChart} 
-            label="Cierre Z" 
-            isActive={isActive('/close')} 
-            onClick={() => navigate('/close')} 
-            mobile
-          />
-           <SidebarItem 
-            icon={Users} 
-            label="Usuarios" 
-            isActive={isActive('/users')} 
-            onClick={() => navigate('/users')} 
-            mobile
-          />
+          {/* Hidden items on mobile to fit screen, or add more scroll logic */}
       </div>
     </div>
   );

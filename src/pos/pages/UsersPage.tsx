@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Plus, Edit2, Trash2, Shield, MapPin, Mail, MoreVertical } from 'lucide-react';
 import { usePosStore } from '../../hooks/usePosStore';
@@ -147,21 +148,18 @@ export const UsersPage = () => {
                     </td>
 
                     <td className="p-5 text-right">
-                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity">
                           <button 
                             onClick={() => handleEditClick(user)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            className="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors shadow-sm"
                           >
                             <Edit2 size={18} />
                           </button>
                           <button 
                             onClick={() => handleDeleteClick(user.id)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
                           >
                             <Trash2 size={18} />
-                          </button>
-                          <button className="md:hidden p-2 text-slate-400">
-                            <MoreVertical size={18} />
                           </button>
                        </div>
                     </td>
